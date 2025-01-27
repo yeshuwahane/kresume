@@ -3,6 +3,7 @@ package com.cyphernerd.resume.presentation.baking
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.ai.client.generativeai.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ class BakingViewModel : ViewModel() {
 
     private val generativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",
-        apiKey = BuildConfig.apiKey
+        apiKey = "AIzaSyD0r13hFT_FNSCDwWpxzZSHxXBsIqs6lIo"
     )
 
     fun sendPrompt(

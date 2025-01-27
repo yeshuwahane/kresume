@@ -11,13 +11,15 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        google()
-        mavenCentral()
-    }
-}
+        google();
+        mavenCentral();
+        maven( url= "https://jitpack.io" ) //zooming photoView
+    }}
+
+rootProject.name = "Resume"
+include(":app")
 
 rootProject.name = "Resume"
 include(":app")

@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -42,6 +44,15 @@ android {
         compose = true
         buildConfig = true
     }
+    packaging{
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+        }
+    }
 }
 
 dependencies {
@@ -64,15 +75,15 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+//    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+
     // Logger
     debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
 
     // Image Loading
     implementation("io.coil-kt:coil-compose:2.4.0")
-
-    // Logging
-    implementation("com.jakewharton.timber:5.0.1")
 
 
     //coil
@@ -86,28 +97,31 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Coroutine support
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
     // Animation
     implementation("com.google.accompanist:accompanist-navigation-animation:0.30.0")
 
     // Retrofit and OkHttp for network calls
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
     // JSON Parsing - Moshi
-    implementation ("com.squareup.moshi:moshi:1.15.0")
-    implementation ("com.squareup.moshi:moshi-kotlin:1.15.0")
+    implementation("com.squareup.moshi:moshi:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 
-    // OAuth2 Authentication
-    implementation ("com.auth0.android:auth0:2.16.0")
 
     // PDF Viewer
-    implementation ("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
-
-    // PDF Generation - Apache PDFBox
+//    implementation ("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
+//    implementation("com.github.TomRoush:PdfBox-Android:2.0.27.0")
     implementation ("com.tom-roush:pdfbox-android:2.0.27.0")
+
+
+
+
+
+
 
     //navigation
     implementation("androidx.compose.material:material:1.5.2")
