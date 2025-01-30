@@ -6,16 +6,16 @@ import com.cyphernerd.resume.data.model.GeminiRequest
 import com.cyphernerd.resume.data.model.GeminiResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
-
+import retrofit2.http.Path
 
 
 interface GeminiApi {
-    @POST("projects/{project}/locations/{location}/endpoints/{endpoint}:generateContent")
+    @POST("/v1beta/projects/{project}/locations/{location}/publishers/google/models/{model}:generateContent")
     suspend fun getGeminiFeedback(
-        @Body request: GeminiRequest,
-        @retrofit2.http.Path("project") project: String,
-        @retrofit2.http.Path("location") location: String,
-        @retrofit2.http.Path("endpoint") endpoint: String
+        @Path("project") project: String,
+        @Path("location") location: String,
+        @Path("model") model: String,
+        @Body request: GeminiRequest
     ): GeminiResponse
 }
 

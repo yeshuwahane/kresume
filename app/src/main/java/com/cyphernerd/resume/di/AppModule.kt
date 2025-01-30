@@ -12,6 +12,7 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -22,7 +23,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    @Provides
+    /*@Provides
     @Singleton
     fun provideRetrofit(@ApplicationContext context: Context): Retrofit = Retrofit.Builder()
         .baseUrl("https://api.openai.com/v1/")
@@ -36,7 +37,33 @@ object AppModule {
             )
             .addInterceptor(ChuckerInterceptor(context))
             .build())
-        .build()
+        .build()*/
+
+
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(@ApplicationContext context: Context): Retrofit{
+        return Retrofit.Builder()
+            .baseUrl("https://generativelanguage.googleapis.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(OkHttpClient.Builder()
+                .addInterceptor(ChuckerInterceptor(context))
+                .build())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGeminiApi(@ApplicationContext context: Context): GeminiApi {
+        return provideRetrofit(context).create(GeminiApi::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideGeminiRepository(geminiApi: GeminiApi): ResumeRepository{
+        return ResumeRepositoryImpl(geminiApi)
+    }
+
 
     @Provides
     @Singleton
@@ -57,10 +84,12 @@ object AppModule {
             .create(OpenAIApi::class.java)
     }
 
-    @Provides
-    @Singleton
-    fun provideGeminiApi(@ApplicationContext context: Context): GeminiApi {
-        val geminiClient = OkHttpClient.Builder()
+
+}
+
+
+/*
+* val geminiClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 chain.proceed(
                     chain.request().newBuilder()
@@ -81,11 +110,4 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .client(geminiClient)
             .build()
-            .create(GeminiApi::class.java)
-    }
-    @Provides
-    @Singleton
-    fun provideGeminiRepository(geminiApi: GeminiApi): ResumeRepository{
-        return ResumeRepositoryImpl(geminiApi)
-    }
-}
+            .create(GeminiApi::class.java)*/

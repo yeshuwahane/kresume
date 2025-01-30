@@ -110,9 +110,9 @@ fun UploadResumeScreen(
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = onReview) {
+                        /*Button(onClick = onReview) {
                             Text("Review Resume")
-                        }
+                        }*/
                     }
                 }
             }

@@ -17,8 +17,8 @@ class ResumeRepositoryImpl @Inject constructor(
 ) : ResumeRepository {
 
     private val projectId = "k-resume"
-    private val location = "us-central1"
-    private val endpointId = "your-endpoint-id"
+    private val location = "global"
+    private val model = "gemini-pro"
 
 
     override suspend fun analyzeResume(resumeText: String, jobDescription: String): GeminiResponse {
@@ -47,7 +47,7 @@ class ResumeRepositoryImpl @Inject constructor(
                 request = request,
                 project = projectId,
                 location = location,
-                endpoint = endpointId
+                model = model
             )
             Log.d("Gemini_API", response.predictions[0].content.parts[0].text)
             response
