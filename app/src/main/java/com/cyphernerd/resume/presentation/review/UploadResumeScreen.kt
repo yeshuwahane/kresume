@@ -15,10 +15,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cyphernerd.resume.data.util.DataResource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,28 +43,22 @@ fun UploadResumeScreen(
     context: Context,
     onReview: () -> Unit
 ) {
-    // Collect both states
     val resumeTextState = viewModel.resumeTextState.collectAsStateWithLifecycle()
     val atsScoreState = viewModel.atsScoreState.collectAsStateWithLifecycle()
-
-    // State for job position input
     var jobPosition by remember { mutableStateOf("") }
-
-    // SnackbarHostState to manage Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    var isDelaying by remember { mutableStateOf(false) }
+    var progress by remember { mutableStateOf(1) }
+    var showScore by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // SnackbarHost to display Snackbar
         SnackbarHost(hostState = snackbarHostState)
 
-        // TextField for job position
         OutlinedTextField(
             value = jobPosition,
             onValueChange = { jobPosition = it },
@@ -71,12 +68,10 @@ fun UploadResumeScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Handle resume text upload state
         when {
             resumeTextState.value.isLoading() -> {
                 CircularProgressIndicator()
             }
-
             resumeTextState.value.isError() -> {
                 Text(
                     text = "Error: ${resumeTextState.value.error?.message ?: "Unknown error"}",
@@ -84,17 +79,14 @@ fun UploadResumeScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
             resumeTextState.value.isSuccess() -> {
                 Text("Resume uploaded successfully!")
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Handle ATS score state
                 when {
                     atsScoreState.value.isLoading() -> {
                         CircularProgressIndicator()
                     }
-
                     atsScoreState.value.isError() -> {
                         Text(
                             text = "Error calculating ATS score: ${atsScoreState.value.error?.message ?: "Unknown error"}",
@@ -102,32 +94,41 @@ fun UploadResumeScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
-
-                    atsScoreState.value.isSuccess() -> {
-                        // Display ATS score
+                    atsScoreState.value.isSuccess() && !showScore -> {
+                        isDelaying = true
+                        LaunchedEffect(Unit) {
+                            for (i in 1..100) {
+                                progress = i
+                                delay(50) // 80ms * 100 = 8 seconds
+                            }
+                            isDelaying = false
+                            showScore = true
+                        }
+                        CircularProgressIndicator(
+                            progress = { progress / 100f },
+                            trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+                        )
+                        Text("Processing... $progress%")
+                    }
+                    atsScoreState.value.isSuccess() && showScore -> {
                         Text(
                             text = "ATS Score: ${atsScoreState.value.data}",
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        /*Button(onClick = onReview) {
-                            Text("Review Resume")
-                        }*/
                     }
                 }
             }
-
             else -> {
                 Text("Please upload a PDF to start.")
             }
         }
 
-        // PDF picker launcher
         val pdfPickerLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             uri?.let {
-                viewModel.extractTextFromPdf(context, it,jobPosition)
+                viewModel.extractTextFromPdf(context, it, jobPosition)
             }
         }
 
@@ -137,7 +138,6 @@ fun UploadResumeScreen(
                 if (jobPosition.isNotBlank()) {
                     pdfPickerLauncher.launch("application/pdf")
                 } else {
-                    // Show Snackbar if job position is empty
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("Please enter a job position.")
                     }
@@ -148,3 +148,4 @@ fun UploadResumeScreen(
         }
     }
 }
+
