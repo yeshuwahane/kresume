@@ -14,23 +14,26 @@ class AtsScoringUseCase @Inject constructor() {
     }
 
     fun calculateScore(resumeText: String, jobDescription: String): Int {
-        val keywordScore = keywordMatchingScore(resumeText, jobDescription) * 0.25 // 25%
-        val skillScore = skillMatchingScore(resumeText, jobDescription) * 0.15 // 15%
+        val keywordScore = keywordMatchingScore(resumeText, jobDescription) * 0.22 // 22%
+        val skillScore = skillMatchingScore(resumeText, jobDescription) * 0.14 // 14%
         val formattingScore = checkFormatting(resumeText) * 0.10 // 10%
-        val readabilityScore = calculateReadability(resumeText) * 0.10 // 10%
-        val lengthScore = checkLength(resumeText) * 0.10 // 10%
-        val actionVerbScore = checkActionVerbs(resumeText) * 0.10 // 10%
+        val readabilityScore = calculateReadability(resumeText) * 0.08 // 8%
+        val lengthScore = checkLength(resumeText) * 0.08 // 8%
+        val actionVerbScore = checkActionVerbs(resumeText) * 0.08 // 8%
         val grammarScore = checkGrammar(resumeText) * 0.05 // 5%
         val bulletPointScore = checkBulletPoints(resumeText) * 0.05 // 5%
         val jobTitleRelevanceScore = jobTitleRelevance(resumeText, jobDescription) * 0.05 // 5%
         val experienceScore = calculateExperience(resumeText) * 0.05 // 5%
+        val educationScore = checkEducation(resumeText) * 0.05 // 5%
+        val projectScore = checkProjects(resumeText) * 0.05 // 5%
 
         val finalScore = (keywordScore + skillScore + formattingScore + readabilityScore +
                 lengthScore + actionVerbScore + grammarScore + bulletPointScore +
-                jobTitleRelevanceScore + experienceScore).toInt()
+                jobTitleRelevanceScore + experienceScore + educationScore + projectScore).toInt()
 
         return finalScore.coerceIn(0, 100)
     }
+
 
     // 1. Keyword Matching (25%)
     private fun keywordMatchingScore(resume: String, jobDescription: String): Int {
@@ -56,7 +59,8 @@ class AtsScoringUseCase @Inject constructor() {
 
     // 3. Formatting Score (10%)
     private fun checkFormatting(resume: String): Int {
-        val sections = listOf("experience", "education", "skills", "certifications", "contact", "projects")
+        val sections =
+            listOf("experience", "education", "skills", "certifications", "contact", "projects")
         val foundSections = sections.count { resume.contains(it, ignoreCase = true) }
         return (foundSections.toDouble() / sections.size * 100).toInt().coerceIn(0, 100)
     }
@@ -120,9 +124,14 @@ class AtsScoringUseCase @Inject constructor() {
 
     // 9. Job Title Relevance Check (5%)
     private fun jobTitleRelevance(resume: String, jobDescription: String): Int {
-        val jobTitleRegex = Regex("(?i)(software engineer|android developer|data scientist|project manager)")
+        val jobTitleRegex =
+            Regex("(?i)(software engineer|android developer|data scientist|project manager)")
         val jobTitleMatches = jobTitleRegex.find(resume)?.value ?: ""
-        return if (jobTitleMatches.isNotEmpty() && jobDescription.contains(jobTitleMatches, ignoreCase = true)) 100 else 50
+        return if (jobTitleMatches.isNotEmpty() && jobDescription.contains(
+                jobTitleMatches,
+                ignoreCase = true
+            )
+        ) 100 else 50
     }
 
     // 10. Experience Calculation (5%)
@@ -137,4 +146,21 @@ class AtsScoringUseCase @Inject constructor() {
             else -> 30 // No experience mentioned
         }
     }
+
+    // 12. Education Check (5%)
+    private fun checkEducation(resume: String): Int {
+        val educationKeywords = listOf("Bachelor", "Master", "PhD", "BSc", "MSc", "MBA")
+        val foundEducation = educationKeywords.count { resume.contains(it, ignoreCase = true) }
+        return (foundEducation.toDouble() / educationKeywords.size * 100).toInt().coerceIn(0, 100)
+    }
+
+
+    // 13. Project Experience (5%)
+    private fun checkProjects(resume: String): Int {
+        val projectKeywords = listOf("developed", "designed", "built", "implemented", "launched")
+        val foundProjects = projectKeywords.count { resume.contains(it, ignoreCase = true) }
+        return (foundProjects.toDouble() / projectKeywords.size * 100).toInt().coerceIn(0, 100)
+    }
+
+
 }
