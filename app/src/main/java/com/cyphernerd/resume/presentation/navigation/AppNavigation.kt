@@ -6,7 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cyphernerd.resume.presentation.GetStartedScreen
+import com.cyphernerd.resume.presentation.intro.GetStartedScreen
 import com.cyphernerd.resume.presentation.review.ResumeViewModel
 import com.cyphernerd.resume.presentation.review.ReviewScreen
 import com.cyphernerd.resume.presentation.review.UploadResumeScreen
